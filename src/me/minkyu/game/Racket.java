@@ -2,24 +2,53 @@ package me.minkyu.game;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
-public class Racket {
-	private int x = 0;
-	private int xa = 0;
-	private Game game;
+class Racket {
+	private static final int Y = 330;
+	private static final int WIDTH = 60;
+	private static final int HEIGHT = 10;
 	
-	public Racket(Game game) { // racket constructor
-		this.game = game;
+	private int screenWidth;
+	private	int x = 0;
+	private int paused = 1;
+	
+	private Ball ball;
+	
+	Racket(Ball ball, int width) {
+		screenWidth = width;
+		this.ball = ball;
 	}
 	
-	public void move() { // moves the racket
-		int cursorX = (int) MouseInfo.getPointerInfo().getLocation().getX();
-		
-		if (x + xa > 0 && x + xa < game.getWidth() - 60)
-			x += xa;
+	void move() {
+		if (paused == -1) {
+			x = ball.getX();
+		}
 	}
 	
-	public void paint(Graphics2D g) {
-		g.fillRect(x, 330, 60, 10);
+	void keyPressed(KeyEvent e) {
+		if (e.getKeyChar() == 'a') {
+			paused *= -1;
+		}
+	}
+	
+	void paint(Graphics2D g) {
+		g.fillRect(x, Y, WIDTH, HEIGHT);
+	}
+	
+	Rectangle getBounds() {
+		return new Rectangle(x, Y, WIDTH, 1);
+	}
+	
+	
+	void mouseMoved(MouseEvent e) {
+		if (paused == -1)
+			return;
+		x = e.getX() - WIDTH / 2;
+		if (x < 0)
+			x = 0;
+		if (x > screenWidth - WIDTH) {
+			x = screenWidth - WIDTH;
+		}
 	}
 }
