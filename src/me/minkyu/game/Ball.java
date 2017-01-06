@@ -5,16 +5,16 @@ import java.awt.event.KeyEvent;
 
 class Ball {
 	private static final int DIAMETER = 30;
+	private static final int INITVEL = 2;
 	
-	private int x = 0;
-	private int y = 0;
-	private int xa = 4;
-	private int ya = 4;
-	private int savedX;
-	private int savedY;
-	private int paused = 1;
+	private boolean paused = false;
+	
+	private int x;
+	private int y;
 	private int width;
 	private int height;
+	private int xa = INITVEL;
+	private int ya = INITVEL;
 	
 	private Game game;
 	
@@ -25,22 +25,27 @@ class Ball {
 	}
 	
 	void move() {
-		if (paused == -1)
+		if (paused)
 			return;
 		
-		if (x + xa < 0)
+		if (x + xa < 0) {
 			xa = Math.abs(xa);
-		if (x + xa > width - DIAMETER)
+		}
+		if (x + DIAMETER >= width) {
 			xa = -Math.abs(xa);
-		if (y + ya < 0)
+		}
+		if (y + ya < 0) {
 			ya = Math.abs(ya);
-		if (y + ya > height - DIAMETER)
+		}
+		if (y + DIAMETER >= height) {
 			game.gameOver();
-		if (isCollision()) {
+		}
+		
+		if (collision()) { // does not reach
 			game.changeScore();
 			ya = -Math.abs(ya);
-			xa += xa/Math.abs(xa);
-			ya += ya/Math.abs(ya);
+			xa += xa / Math.abs(xa);
+			ya += ya / Math.abs(ya);
 		}
 		
 		x += xa;
@@ -48,31 +53,34 @@ class Ball {
 	}
 	
 	void paint(Graphics2D g) {
+		g.setColor(Color.BLUE);
 		g.fillOval(x, y, DIAMETER, DIAMETER);
 	}
 	
 	void restart() {
-		x = width / (int) (10 * Math.random() + 1);
+		x = (int) (width * Math.random());
 		y = 0;
-		xa = 4;
-		ya = 4;
+		int sign = 1;
+		if (Math.random() - 0.5 < 0)
+			sign = -1;
+		xa = INITVEL * sign;
+		ya = INITVEL;
+	}
+	
+	private boolean collision() {
+		return game.racket.getBounds().intersects(getBounds());
 	}
 	
 	void keyPressed(KeyEvent e) {
-		if (e.getKeyChar() == 'p') {
-			paused *= -1;
-		}
-	}
-	
-	private boolean isCollision() {
-		return game.racket.getBounds().intersects(getBounds());
+		if (e.getKeyChar() == 'p')
+			paused = !paused;
 	}
 	
 	private Rectangle getBounds() {
 		return new Rectangle(x, y + DIAMETER, DIAMETER, 1);
 	}
 	
-	public int getX() {
-		return x;
+	int getMiddleX() {
+		return x + DIAMETER / 2;
 	}
 }

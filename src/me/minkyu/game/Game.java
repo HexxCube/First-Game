@@ -7,16 +7,15 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-@SuppressWarnings("serial")
 public class Game extends JPanel {
 	private static int width = 300;
 	private static int height = 400;
 	
+	Ball ball = new Ball(this, width, height);
+	Racket racket = new Racket(this, width, height);
+	
 	private int score = 0;
 	private int highScore = 0;
-	
-	private Ball ball = new Ball(this, width, height);
-	Racket racket = new Racket(ball, width);
 	
 	private Game() {
 		addKeyListener(new KeyListener() {
@@ -38,6 +37,26 @@ public class Game extends JPanel {
 		});
 		
 		setFocusable(true);
+	}
+	
+	public static void main(String[] args) throws InterruptedException {
+		JFrame frame = new JFrame("Mini Tennis");
+		Game game = new Game();
+		
+		frame.setSize(width, height);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//		frame.setPreferredSize(new Dimension(width, height));
+		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.add(game);
+//		frame.pack();
+		frame.setLocationRelativeTo(null);
+		
+		while (true) {
+			game.move();
+			game.repaint();
+			Thread.sleep(5);
+		}
 	}
 	
 	private void restart() {
@@ -63,25 +82,7 @@ public class Game extends JPanel {
 		g2d.setFont(new Font("Consolas", Font.BOLD, 12));
 		g2d.drawString("Score: " + String.valueOf(score), 10, 30);
 		g2d.setColor(Color.BLUE);
-		g2d.drawString("High Score: " + String.valueOf(highScore), 80, 30);
-	}
-	
-	public static void main(String[] args) throws InterruptedException {
-		JFrame frame = new JFrame("Mini Tennis");
-		Game game = new Game();
-		
-		frame.add(game);
-		frame.setSize(width, height);
-		frame.setUndecorated(true);
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setLocationRelativeTo(null);
-		
-		while (true) {
-			game.move();
-			game.repaint();
-			Thread.sleep(10);
-		}
+		g2d.drawString("High Score: " + String.valueOf(highScore), 90, 30);
 	}
 	
 	void changeScore() {
